@@ -2,12 +2,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Composer from "./Composer";
+import CopyButton from "./CopyButton";
 import type { ReadResponse, PostOut } from "@/lib/board";
 
 const POLL_MS = 4000;
 
 function fmt(iso: string) {
   return new Date(iso).toLocaleString("de-DE", { timeZone: "Europe/Berlin", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+}
+function postText(p: PostOut, name: (s: string) => string) {
+  const head = `${name(p.author)} · ${fmt(p.created_at)}${p.type === "pass" ? " · pass" : ""}${p.out_of_turn ? " · out of turn" : ""}`;
+  return `${head}\n${p.body || (p.type === "pass" ? "(passt)" : "")}`;
 }
 function renderBody(body: string) {
   const parts = body.split(/(#[a-z0-9_-]+)/gi);
@@ -61,7 +66,11 @@ export default function ThreadView({ threadId, isAdmin }: { threadId: number; is
       <div className="flex items-start justify-between gap-3">
         <div>
           <Link href="/" className="text-xs text-muted-foreground hover:underline">← Threads</Link>
-          <h1 className="text-2xl font-extrabold">{data.thread.title}</h1>
+          <h1 className="text-2xl font-extrabold flex items-center gap-2">
+            {data.thread.title}
+            <CopyButton size={16} title="Ganzen Thread kopieren"
+              text={() => `# ${data.thread.title}\n\n` + posts.map((p) => postText(p, name)).join("\n\n---\n\n")} />
+          </h1>
         </div>
         {isAdmin && !closed ? (
           <button className="btn" onClick={() => api("close", {})}>Thread schließen</button>
@@ -87,6 +96,7 @@ export default function ThreadView({ threadId, isAdmin }: { threadId: number; is
               {p.type === "pass" ? <span className="pill bg-muted">pass</span> : null}
               {p.type === "system" ? <span className="pill bg-muted">system</span> : null}
               {p.out_of_turn ? <span className="pill" style={{ background: "var(--warning)", color: "#000" }}>out of turn</span> : null}
+              <span className="ml-auto"><CopyButton text={() => p.body} title="Beitrag kopieren" /></span>
             </div>
             <div className="post-body">{p.type === "pass" && !p.body ? <em className="text-muted-foreground">passt</em> : renderBody(p.body)}</div>
           </li>
