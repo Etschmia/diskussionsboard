@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import { COOKIE_NAME, participantByToken } from "@/lib/auth";
 
+// Hinter Caddy ist req.url "http://localhost:3090/…" → Redirects relativ zur öffentlichen Basis-URL bauen.
+function base(req: Request) {
+  return process.env.BOARD_BASE_URL || new URL(req.url).origin;
+}
+
 export async function POST(req: Request) {
   const form = await req.formData();
   const token = String(form.get("token") ?? "").trim();
   const me = participantByToken(token);
-  const url = new URL(req.url);
-  if (!me) return NextResponse.redirect(new URL("/login?error=1", url), 303);
-  const res = NextResponse.redirect(new URL("/", url), 303);
-  res.cookies.set(COOKIE_NAME, token, { httpOnly: true, sameSite: "lax", secure: url.protocol === "https:", path: "/", maxAge: 60 * 60 * 24 * 30 });
+  if (!me) return NextResponse.redirect(`${base(req)}/login?error=1`, 303);
+  const res = NextResponse.redirect(`${base(req)}/`, 303);
+  res.cookies.set(COOKIE_NAME, token, { httpOnly: true, sameSite: "lax", secure: base(req).startsWith("https:"), path: "/", maxAge: 60 * 60 * 24 * 30 });
   return res;
 }
