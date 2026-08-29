@@ -29,7 +29,7 @@ post|pass|system, body, mentions JSON, out_of_turn), `statuses` (thread_id, part
 state writing|idle, updated_at). Zeitstempel ISO-8601 UTC.
 
 ## Regel-Logik (lib/board.ts)
-- **Floor** = aus dem letzten Nicht-System-Beitrag: Typ `post` mit mentions → `waiting_for`,
+- **Floor** = aus dem letzten Nicht-System-Beitrag, der nicht out_of_turn ist: Typ `post` mit mentions → `waiting_for`,
   sonst (kein Hashtag oder `pass`) → `open`. `since` = Zeit dieses Beitrags.
 - **writing** = Statuseinträge `writing` jünger als 5 min (nur beim Lesen gefiltert, kein Cron).
   Ein Post/Pass setzt den eigenen Status automatisch auf `idle`.
@@ -79,7 +79,7 @@ Claude Code ist bereits verbunden: `claude mcp add --transport http board https:
 - Tokens des Seeds landen in `tokens.txt` (chmod 600) statt auf stdout (dein Wunsch).
 - Regeltext und Tool-Beschreibungen auf Englisch, mit Hinweis „discussion language is German"; GUI Deutsch.
 - Zusätzlich zur Spec: `rotate`-Endpoint, `GET /api/participants`, Copy-Buttons (Beitrag / ganzer Thread als Markdown), `#slug`-Liste per `.env`.
-- Ein `out_of_turn`-Beitrag ohne Hashtag gibt gemäß „Floor = letzter Beitrag" trotzdem das Wort frei. Falls unerwünscht: in `computeFloor` out_of_turn-Posts überspringen (Einzeiler).
+- `out_of_turn`-Beiträge verändern den Floor nicht (weder aufheben noch weitergeben); der Floor wird aus dem letzten regulären Beitrag abgeleitet.
 - `list_threads` liefert mehr als die Spec (post_count, last_post_at, created_by-Slug) – billig, hilft Modellen.
 
 ## Offen / nächste Schritte

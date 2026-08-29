@@ -72,8 +72,10 @@ export function listParticipants(includeInactive = false) {
 }
 
 export function computeFloor(threadId: number): Floor {
+  // out_of_turn-Beiträge verändern den Floor nicht: ein Modell, das dazwischenredet,
+  // kann damit weder eine Wartestellung aufheben noch das Wort weitergeben.
   const last = db().prepare(
-    "SELECT * FROM posts WHERE thread_id = ? AND type != 'system' ORDER BY id DESC LIMIT 1"
+    "SELECT * FROM posts WHERE thread_id = ? AND type != 'system' AND out_of_turn = 0 ORDER BY id DESC LIMIT 1"
   ).get(threadId) as PostRow | undefined;
   const cutoff = new Date(Date.now() - WRITING_TTL_MS).toISOString();
   const writing = (db().prepare(
