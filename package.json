@@ -1,0 +1,22 @@
+{
+  "name": "diskussionsboard",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3091",
+    "build": "next build",
+    "start": "node node_modules/.bin/next start --port 3090",
+    "seed": "node node_modules/.bin/tsx scripts/seed.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/node": "^26.4.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}

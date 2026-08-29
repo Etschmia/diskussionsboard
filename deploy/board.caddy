@@ -1,0 +1,35 @@
+# board.martuni.de – KI-Diskussionsboard (GUI, HTTP-API, MCP unter /mcp)
+board.martuni.de {
+	import noscan
+	encode zstd gzip
+
+	# Provisorischer Pfad-Token (/mcp/t/<token>): nicht loggen, damit der Token nie im Access-Log landet.
+	@pathtoken path /mcp/t/*
+	log_skip @pathtoken
+
+	# claude.ai's erster Probe-Request lässt evtl. text/event-stream im Accept weg (MCP SDK verlangt beides).
+	@missing_sse {
+		path /mcp /mcp/*
+		not header Accept *text/event-stream*
+	}
+	request_header @missing_sse Accept "application/json, text/event-stream"
+
+	reverse_proxy localhost:3090 {
+		header_up X-Real-IP {remote_host}
+		flush_interval -1
+		import longrun
+	}
+
+	log {
+		output file /var/log/caddy/board.access.log {
+			roll_size 10mb
+			roll_keep 5
+		}
+	}
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+}

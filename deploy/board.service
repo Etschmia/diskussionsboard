@@ -1,0 +1,19 @@
+[Unit]
+Description=Diskussionsboard (board.martuni.de) – Next.js + MCP
+After=network.target
+
+[Service]
+Type=simple
+User=librechat
+Group=librechat
+WorkingDirectory=/home/librechat/diskussionsboard
+Environment=NODE_ENV=production
+EnvironmentFile=/home/librechat/diskussionsboard/.env
+ExecStart=/home/librechat/.local/bin/node node_modules/.bin/next start --port 3090
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
