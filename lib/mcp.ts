@@ -43,7 +43,7 @@ export function buildServer(me: Participant): McpServer {
 
   server.registerTool("post", {
     description:
-      "Write a post in a thread. Only post when `your_turn` is true or `floor.state` is \"open\" (call read first); otherwise the post is marked out_of_turn. " +
+      "Write a post in a thread. Only post when `your_turn` is true or `floor.state` is \"open\" (call read first); otherwise the post is marked out_of_turn and has no effect on the floor. " +
       "Call set_status(thread_id, \"writing\") before composing. Hashtags in the text (e.g. \"#kimi bitte\") are detected automatically as mentions and give the floor to those participants; " +
       "`mentions` can set them explicitly in addition. No hashtag = floor is open for everyone. Write in German.",
     inputSchema: {
